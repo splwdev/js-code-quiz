@@ -13,15 +13,15 @@ var initials = document.querySelector("#initials");
 var submitButton = document.querySelector("#submit");
 var feedback = document.querySelector("#feedback");
 
-
 // Other variables
 var timeLeft = 60;
+var index = 0;
 
 // Functions
 // Startgame function
 function startGame() { 
-  startScreen.style.display = "none";
-  questions.style.display = "block";
+  startScreen.setAttribute("class", "hide");
+  questions.removeAttribute("class");
   startTimer();
   showQuestion();
 }
@@ -46,14 +46,22 @@ function endGame() {
 
 // Question function
 function showQuestion() {
-  for (i = 0; i < questions.children.length; i++) {
-    choices.appendChild(questions.children[i]);
+  // shows the question in the question-title element
+  questionTitle.textContent = questionSource[index].question;
+  // looping through creating buttons for the answer choices and setting attributes
+  for (i = 0; i < questionSource[index].choices.length; i++) {
+    var choiceBtn = document.createElement("button");
+    choiceBtn.setAttribute("id", "button" + i);
+    choiceBtn.textContent = questionSource[index].choices[i];
+    choices.appendChild(choiceBtn);
   }
 }
 
 // Check answer function
 function checkAnswer(event) { 
   event.preventDefault();
+
+  if()
 
 }
 
