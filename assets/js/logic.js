@@ -27,6 +27,8 @@ choices.appendChild(answer);
 var timeLeft = 60;
 var index = 0;
 var score = 0;
+var storeHighScores = localStorage.getItem("highScore");
+var scoresArray = [];
 
 // Functions
 // Startgame function
@@ -64,17 +66,20 @@ function startTimer() {
 
 // Endgame function
 function endGame() {
+  // hides questions element
   questions.setAttribute("class", "hide");
   endScreen.setAttribute("class", "");
-  feedback.setAttribute("class", "");
+  // stops the time and addes the time left over to the score
+  // displays the users final score
   clearInterval(timeInterval);
   score = score + timeLeft;
-  localStorage.setItem("score", score);
   finalScore.textContent = score;
 };
 
 // Question function
 function showQuestion() {
+  // runs if the index is less than the questions source length or if there is time left
+  // TODO: possibly change or to an and to see results
   if (index < questionSource.length || timeLeft > 0) {
     if (answer.getAttribute("class") === "") {
       setTimeout(function () {
@@ -101,23 +106,29 @@ function showQuestion() {
 // Check answer function
 function checkAnswer(event) { 
   event.preventDefault();
+
   var answer = document.querySelector("#answer");
+  // removing the class of the element with id of answer
   answer.setAttribute("class", "");
 
+  // setting the clicked on answer as the chosenAnswer
   var chosenAnswer = event.target.textContent;
-  console.log(chosenAnswer);
+  // console.log(chosenAnswer);
+  // Getting the correct answer from the question source
   var correctAnswer = questionSource[index].answer;
   
+  // if answer is correct, adding score of 5, if incorrect removing 10 seconds from timeLeft
   if (correctAnswer === chosenAnswer) {
     score += 5;
-    console.log(score);
-    localStorage.setItem("score", score);
+    // console.log(score);
     answer.textContent = "Correct!";
   } else {
     timeLeft -= 10;
     answer.textContent = "Wrong!";
   }
 
+  // adding 1 to the index of questions, if index is less than questions
+  // remove buttons and continue with next questions otherwise end game
   index += 1;
   if (index < questionSource.length) {
     removeButton();
@@ -143,13 +154,27 @@ function addScore(event) {
   event.preventDefault();
   
   // Alerts user that initials are required
-  if (initials === "") {
-    alert("Please enter your iniitals");
-    return;
+  
+  
+  var user = {
+    userInitials: initials.value.trim(),
+    userScore: score
   }
-  var storeHighScores = localStorage.setItem("userScore", score);
-  var scoresArray;
+  // console.log(typeof user);
+  
+  // console.log(user);
+  // adds the user to the local storage
+  // var storeHighScores = localStorage.getItem("highScore");
+  // console.log(storeHighScores);
+  // console.log(typeof storeHighScores);
 
+  // var scoresArray = [];
+
+  // console.log(scoresArray);
+
+
+  // if nothing in storeHighScores, empty array else
+  // using JSON.parse on array to construct the value in the object string
   if (storeHighScores === null) {
     scoresArray = [];
   }
@@ -157,18 +182,17 @@ function addScore(event) {
     scoresArray = JSON.parse(storeHighScores);
   }
 
-  var user = {
-    userInitials: initials.value.trim(),
-    userScore: score
-  }
+  
 
   // pushes user initials and score to scoresArray array
   scoresArray.push(user);
-
-  // stringify's the scores array
+  
+  // converting highScoreString value back to string
   var highScoresString = JSON.stringify(scoresArray);
+  console.log(highScoresString);
+
   // put highScoresString in local storage
-  window.localStorage.setItem("userScore", highScoresString);
+  window.localStorage.setItem("highScore", highScoresString);
 }
 
 // Event Listeners
@@ -177,8 +201,12 @@ startButton.addEventListener("click", startGame);
 // choiceBtn.addEventListener("click", checkAnswer);
 choices.addEventListener("click", checkAnswer);
 // submitButton event listener
-submitButton.addEventListener("click", function(event) {
+submitButton.addEventListener("click", function (event) {
+  if (initials === "" || initials === null) {
+    alert("Please enter your iniitals");
+    return endGame();
+  }
   addScore(event);
-
+  // redirecting to highscores.html
   window.location.href = "highscores.html";
 });

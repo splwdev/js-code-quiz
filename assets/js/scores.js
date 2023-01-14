@@ -1,27 +1,34 @@
 // Query Selectors
-var highscores = document.querySelector("#highscores");
+var hScores = document.querySelector("#highscores");
 var clearButton = document.querySelector("#clear");
 
-// Functions
-// Get score
-// function getScore() {
-//     var finalScore = localStorage.getItem("userScore");
-//     if (finalScore == null) { 
-//         finScore = 0;
-//     }
-//     else {
-//         finScore = finalScore;;
-//     }
-// }
+var finalScore = localStorage.getItem("highScore");
 
-// on page opening, display user initials and their corresponding score
-// getScore();
-var finalScore = localStorage.getItem("userScore");
-var lastUserString = JSON.stringify(finalScore);
-console.log(lastUserString);
-var lastUser = JSON.parse(lastUserString);
-
-// sort high scores from highest score to lowest score
-
+// runs displayHighScores function
+displayHighScores();
 
 // create function to clear highscores table
+clearButton.addEventListener("click", function() {
+    localStorage.clear();
+    hScores.innerHTML = "";
+});
+
+// create function to display highscores
+function displayHighScores() {
+    var highscores = JSON.parse(finalScore);
+    // console.log(highscores);
+
+    // loop through high scores
+    for (i = 0; i < highscores.length; i++) {
+        // sorts high scores in ascending order
+        highscores.sort(function(a, b) {
+            return b.userScore - a.userScore
+        });
+        // creates li element
+        var li = document.createElement("li");
+        // displays the intials and score in format of "initial - score"
+        li.textContent = highscores[i].userInitials + " - " + highscores[i].userScore;
+        // apppends the li element to the element with the highscores id
+        hScores.appendChild(li);
+    }
+}
