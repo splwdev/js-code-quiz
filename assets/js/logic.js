@@ -46,22 +46,24 @@ function startTimer() {
   // sets the display for the timer class to equal the timeLeft variable (60 secs)
   timer.textContent = timeLeft;
   // goes through and kicks off a countdown from 60 secs to 0 secs
-    timeInterval = setInterval(function () {
+  timeInterval = setInterval(function () {
       timeLeft--;
-      timer.textContent = timeLeft;
+    timer.textContent = timeLeft;
+    if (timeLeft >= 0) {
+      if (index >= questions.length && timeLeft > 0) {
+        clearInterval(timeInterval);
+        endGame();
+      }
+      else if (timeLeft === 0) {
+        endGame();
+      }
+    }
     }, 1000)
   // if the player runs out of time, it clears the time interval and then calls the end game function
 };
-    // TO DO: add condition if player answers all questions before time runs out
-    // else if (index >= questions.length) {
-    //   score = score + timeLeft;
-    //   localStorage.setItem("score", score);
-    //   console.log(score);
-    // }
 
 // Endgame function
 function endGame() {
-  // TODO: add endgame function
   questions.setAttribute("class", "hide");
   endScreen.setAttribute("class", "");
   feedback.setAttribute("class", "");
@@ -73,7 +75,7 @@ function endGame() {
 
 // Question function
 function showQuestion() {
-  if (index < questionSource.length) {
+  if (index < questionSource.length || timeLeft > 0) {
     if (answer.getAttribute("class") === "") {
       setTimeout(function () {
         answer.setAttribute("class", "hide");
@@ -136,24 +138,37 @@ function removeButton() {
   }
 }
 
-// Obtain score function
-function getScore() {
-
-}
-
-// Display score function
-function displayScore() { 
-
-}
-
 // Add score to local storage function
-function addScore() { 
+function addScore(event) {
+  event.preventDefault();
+  
+  // Alerts user that initials are required
+  if (initials === "") {
+    alert("Please enter your iniitals");
+    return;
+  }
+  var storeHighScores = localStorage.setItem("userScore", score);
+  var scoresArray;
 
-}
+  if (storeHighScores === null) {
+    scoresArray = [];
+  }
+  else {
+    scoresArray = JSON.parse(storeHighScores);
+  }
 
-// Submit score function
-function submitScore() { 
+  var user = {
+    userInitials: initials.value.trim(),
+    userScore: score
+  }
 
+  // pushes user initials and score to scoresArray array
+  scoresArray.push(user);
+
+  // stringify's the scores array
+  var highScoresString = JSON.stringify(scoresArray);
+  // put highScoresString in local storage
+  window.localStorage.setItem("userScore", highScoresString);
 }
 
 // Event Listeners
@@ -163,15 +178,7 @@ startButton.addEventListener("click", startGame);
 choices.addEventListener("click", checkAnswer);
 // submitButton event listener
 submitButton.addEventListener("click", function(event) {
-  event.preventDefault();
-  
-  // create user object from submission
-  var user = {
-    userInitials: initials.value.trim(),
-    userScore: finalScore
-  };
-  // adding user object to local storage
-  localStorage.setItem("user", user);
-  // redirecting to highscores.html page
+  addScore(event);
+
   window.location.href = "highscores.html";
 });
