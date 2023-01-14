@@ -46,34 +46,53 @@ function startTimer() {
   // sets the display for the timer class to equal the timeLeft variable (60 secs)
   timer.textContent = timeLeft;
   // goes through and kicks off a countdown from 60 secs to 0 secs
-  timeInterval = setInterval(function () {
-    timeLeft--;
-    timer.textContent = timeLeft;
-    // if the player runs out of time, it clears the time interval and then calls the end game function
-    if(timeLeft === 0) {
-      clearInterval(timeInterval);
-      endGame();
-    }
-    // TO DO: add condition if player answers all questions before time runs out
-  }, 1000);
+    timeInterval = setInterval(function () {
+      timeLeft--;
+      timer.textContent = timeLeft;
+    }, 1000)
+  // if the player runs out of time, it clears the time interval and then calls the end game function
 };
+    // TO DO: add condition if player answers all questions before time runs out
+    // else if (index >= questions.length) {
+    //   score = score + timeLeft;
+    //   localStorage.setItem("score", score);
+    //   console.log(score);
+    // }
 
 // Endgame function
 function endGame() {
   // TODO: add endgame function
+  questions.setAttribute("class", "hide");
+  endScreen.setAttribute("class", "");
+  feedback.setAttribute("class", "");
+  clearInterval(timeInterval);
+  score = score + timeLeft;
+  localStorage.setItem("score", score);
+  finalScore.textContent = score;
 };
 
 // Question function
 function showQuestion() {
-  // shows the question in the question-title element
-  questionTitle.textContent = questionSource[index].question;
-  // looping through creating buttons for the answer choices and setting attributes
-  for (i = 0; i < questionSource[index].choices.length; i++) {
-    var choiceBtn = document.createElement("button");
-    choiceBtn.setAttribute("id", "button" + i);
-    choiceBtn.textContent = questionSource[index].choices[i];
-    // appends the buttons to the choices element based on the number of choices
-    olChoices.appendChild(choiceBtn);
+  if (index < questionSource.length) {
+    if (answer.getAttribute("class") === "") {
+      setTimeout(function () {
+        answer.setAttribute("class", "hide");
+      }, 500);
+    };
+
+    // shows the question in the question-title element
+    questionTitle.textContent = questionSource[index].question;
+    // looping through creating buttons for the answer choices and setting attributes
+    for (i = 0; i < questionSource[index].choices.length; i++) {
+      var choiceBtn = document.createElement("button");
+      choiceBtn.setAttribute("id", "button" + i);
+      choiceBtn.textContent = questionSource[index].choices[i];
+      // appends the buttons to the choices element based on the number of choices
+      olChoices.appendChild(choiceBtn);
+    }
+  }
+  else {
+    endGame();
   }
 }
 
@@ -87,14 +106,16 @@ function checkAnswer(event) {
   console.log(chosenAnswer);
   var correctAnswer = questionSource[index].answer;
   
-  for (i = 0; i < questionSource[index].answer.length; i++) {
-    if (correctAnswer === chosenAnswer) {
-      score++;
-      answer.textContent = "Correct!";
-    } else {
-      answer.textContent = "Wrong!";
-    }
+  if (correctAnswer === chosenAnswer) {
+    score += 5;
+    console.log(score);
+    localStorage.setItem("score", score);
+    answer.textContent = "Correct!";
+  } else {
+    timeLeft -= 10;
+    answer.textContent = "Wrong!";
   }
+
   index += 1;
   if (index < questionSource.length) {
     removeButton();
@@ -106,8 +127,11 @@ function checkAnswer(event) {
 
 // remove button function
 function removeButton() {
+  // looping through the choices for the current question
   for (i = 0; i < questionSource[index].choices.length; i++) {
+    // getting each of the buttons in the loop
     var choiceBtn = document.getElementById("button" + i);
+    // removing the buttons from the DOM
     choiceBtn.parentNode.removeChild(choiceBtn);
   }
 }
@@ -130,9 +154,24 @@ function addScore() {
 // Submit score function
 function submitScore() { 
 
-}// Event Listeners
+}
+
+// Event Listeners
 // add event listener for on start
 startButton.addEventListener("click", startGame);
 // choiceBtn.addEventListener("click", checkAnswer);
 choices.addEventListener("click", checkAnswer);
-
+// submitButton event listener
+submitButton.addEventListener("click", function(event) {
+  event.preventDefault();
+  
+  // create user object from submission
+  var user = {
+    userInitials: initials.value.trim(),
+    userScore: finalScore
+  };
+  // adding user object to local storage
+  localStorage.setItem("user", user);
+  // redirecting to highscores.html page
+  window.location.href = "highscores.html";
+});
