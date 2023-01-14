@@ -69,6 +69,7 @@ function endGame() {
   // hides questions element
   questions.setAttribute("class", "hide");
   endScreen.setAttribute("class", "");
+  
   // stops the time and addes the time left over to the score
   // displays the users final score
   clearInterval(timeInterval);
@@ -80,7 +81,7 @@ function endGame() {
 function showQuestion() {
   // runs if the index is less than the questions source length or if there is time left
   // TODO: possibly change or to an and to see results
-  if (index < questionSource.length || timeLeft > 0) {
+  if (index < questionSource.length && timeLeft > 0) {
     if (answer.getAttribute("class") === "") {
       setTimeout(function () {
         answer.setAttribute("class", "hide");
@@ -153,25 +154,10 @@ function removeButton() {
 function addScore(event) {
   event.preventDefault();
   
-  // Alerts user that initials are required
-  
-  
   var user = {
     userInitials: initials.value.trim(),
     userScore: score
   }
-  // console.log(typeof user);
-  
-  // console.log(user);
-  // adds the user to the local storage
-  // var storeHighScores = localStorage.getItem("highScore");
-  // console.log(storeHighScores);
-  // console.log(typeof storeHighScores);
-
-  // var scoresArray = [];
-
-  // console.log(scoresArray);
-
 
   // if nothing in storeHighScores, empty array else
   // using JSON.parse on array to construct the value in the object string
@@ -182,8 +168,6 @@ function addScore(event) {
     scoresArray = JSON.parse(storeHighScores);
   }
 
-  
-
   // pushes user initials and score to scoresArray array
   scoresArray.push(user);
   
@@ -193,6 +177,16 @@ function addScore(event) {
 
   // put highScoresString in local storage
   window.localStorage.setItem("highScore", highScoresString);
+
+  // Checking to ensure that initials input field has been filled out. if not return
+  if (initials.value === "") {
+    alert("Please enter your iniitals");
+    return;
+  }
+  else {
+    // redirecting to highscores.html
+    window.location.href = "highscores.html";
+  }
 }
 
 // Event Listeners
@@ -200,13 +194,13 @@ function addScore(event) {
 startButton.addEventListener("click", startGame);
 // choiceBtn.addEventListener("click", checkAnswer);
 choices.addEventListener("click", checkAnswer);
+// initials input submit button disabled if empty
+initials.addEventListener("input", function () {
+  submitButton.disabled = (this.value === '');
+});
+
 // submitButton event listener
 submitButton.addEventListener("click", function (event) {
-  if (initials === "" || initials === null) {
-    alert("Please enter your iniitals");
-    return endGame();
-  }
   addScore(event);
-  // redirecting to highscores.html
-  window.location.href = "highscores.html";
+  
 });
