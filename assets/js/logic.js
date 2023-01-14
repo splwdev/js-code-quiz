@@ -29,6 +29,9 @@ var index = 0;
 var score = 0;
 var storeHighScores = localStorage.getItem("highScore");
 var scoresArray = [];
+var correctSound = new Audio("../sfx/correct.wav");
+var wrongSound = new Audio("../sfx/incorrect.wav");
+
 
 // Functions
 // Startgame function
